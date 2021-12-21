@@ -201,10 +201,12 @@
           
             
           
-          PCF的数学原理![image-20211221121224624](Games202-Lecture4 Real-Time-Shadow2/image-20211221121224624.png)
+          PCF的数学原理
 x为shading point，投影到shadow map上为点p，q为包含p的范围N内的一点
 对于PCF的filter/convolution卷积：
-​    w函数为根据距离等因素设置的加权，对于
+​    w函数为根据距离等因素设置的加权，对于范围N内的每一个点q，函数值都要加权平均再相加，最后得到p点的值。
+对于PCSS的卷积：
+​    函数的输出为点x的visibility。X函数为符号函数，变量大于零，函数值为1，
         </a>
       </p>
 
