@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>Games202-Lecture4 Real-Time-Shadow 2</title>
+    <link href="/2021/12/22/Games202-Lecture4/"/>
+    <url>/2021/12/22/Games202-Lecture4/</url>
+    
+    <content type="html"><![CDATA[<h1 id="PCF的数学原理"><a href="#PCF的数学原理" class="headerlink" title="PCF的数学原理"></a>PCF的数学原理</h1><p>![image-20211221121224624](Games202-Lecture4 Real-Time-Shadow2/image-20211221121224624.png)</p><p><strong>x为shading point，投影到shadow map上为点p，q为包含p的范围N内的一点</strong></p><p>对于PCF的filter/convolution卷积：</p><p>​    w函数为根据距离等因素设置的加权，对于范围N内的每一个点q，函数值都要加权平均再相加，最后得到p点的值。</p><p>对于PCSS的卷积：</p><p>​    函数的输出为点x的visibility。X函数为符号函数，变量大于零，函数值为1，否则为零。函数内部为点q与点x的深度值之差。若点q挡住了x，则X函数值为0。挡不到的话，X函数值为1。最后对N区域内无遮挡的点进行加权平均，最后得到visibility。</p><p>![image-20211221122948247](Games202-Lecture4 Real-Time-Shadow2/image-20211221122948247.png)</p><p>对于PCF的软阴影PCSS，不要理解为对shadow map本身进行加权平均再比较，这样得到的结果仍旧是非零即一，软阴影要做的就是避开非零即一的情况。</p><p>且PCF不是对于图像空间内的x点的visibility进行加权平均。（PPT写错了，应该是包含x的范围N内的任意点y）</p><h1 id="对PCF的各种优化"><a href="#对PCF的各种优化" class="headerlink" title="对PCF的各种优化"></a>对PCF的各种优化</h1><p>![image-20211221124632089](Games202-Lecture4 Real-Time-Shadow2/image-20211221124632089.png)</p><p>由于PCSS在第一步和第三步都要对一整片区域进行filter，因此效率很低。工业界目前采用取部分采样点的方法，但会产生噪声。</p><p>![image-20211221131957766](Games202-Lecture4 Real-Time-Shadow2/image-20211221131957766.png)</p><p>可以采用正态分布的方法近似求得filter结果：均值决定尖在哪，方差决定了胖瘦。</p><p>![image-20211221132311009](Games202-Lecture4 Real-Time-Shadow2/image-20211221132311009.png)</p><p>应用正态分布，PCF问题可以简化为在Shadow Map上指定任意一块区域，求深度平均值和方差。</p><p>求平均值可以采用mipmap或者SAT方法（见后文）。求方差可以直接用均值与方差的公式求出。为了求平方的均值，另起一张图记录每个深度的平方。在生成shadow map的同时生成square-depth map。</p><p>![image-20211221132836230](Games202-Lecture4 Real-Time-Shadow2/image-20211221132836230.png)</p><p>对于想要求得的shading point x，可以通过均值和方差画出正态分布图，统计CDF(x)，即计算点x之前的面积。工业界直接打表，计算error function（误差函数）。</p><p>![image-20211221220711683](Games202-Lecture4 Real-Time-Shadow2/image-20211221220711683.png)</p><p>可以用切比雪夫不等式近似拟合函数，输入该点的均值和方差，得到的结果为大于点t的函数值，其值不会超过一个上界，甚至不要求是正态分布，对于任意分布都可以这样解。切比雪夫不等式要求t在均值的右边，在左边就不准确了。</p><p>![image-20211221233234475](Games202-Lecture4 Real-Time-Shadow2/image-20211221233234475.png)</p><p>基于以上步骤进行第三步PCF，生成深度图、深度平方图、mipmap、切比雪夫等均需要常数的时间复杂度，因此非常快。但是需要不断更新各种图，也会带来一定的开销。</p><p>![image-20211221233841525](Games202-Lecture4 Real-Time-Shadow2/image-20211221233841525.png)</p><p>解决了第三步的PCF效率问题，我们回头来看第一步。第一步主要是为了找出在一定范围内的遮挡物深度，后面再做平均等操作。如图，假设shading point深度为7，则蓝色区域为遮挡物，红色区域为未遮挡。</p><p>![image-20211221234742608](Games202-Lecture4 Real-Time-Shadow2/image-20211221234742608.png)</p><p>对于第一步的求平均深度，可以采用以下简化的方式快速得出：计算非遮挡物像素所占比例与非遮挡物平均深度，加上遮挡物像素所占比例与遮挡物平均深度乘积，得到的值就是整体的平均深度。两个像素所占的比例可以通过切比雪夫不等式近似快速得出，遮挡物平均深度已知，非遮挡物的平均深度<strong>直接近似为t</strong>！这个假设在shadow面为平面时十分适用。</p><p>![image-20211221235945042](Games202-Lecture4 Real-Time-Shadow2/image-20211221235945042.png)</p><p>给你一张图，和图上的任何一个矩形区域，如何快速求出平均值？</p><p>![image-20211222000125746](Games202-Lecture4 Real-Time-Shadow2/image-20211222000125746.png)</p><p>最简单的一定是mipmap，做<strong>快速、近似、方形的差值操作</strong>。层与层之间可以进行三线性差值求出中间层。</p><h1 id="SAT"><a href="#SAT" class="headerlink" title="SAT"></a>SAT</h1><p>![image-20211222000352092](Games202-Lecture4 Real-Time-Shadow2/image-20211222000352092.png)</p><p>SAT（Sumed Area Table）采用前缀和的方式求平均，将范围内求平均转化为范围内求和的问题。SAT采用预处理的方式先求一遍前缀和，SAT上任何一个元素都代表原始数组从头加到当前位置的总和。可以采用相减的方式求中间任意一段和。</p><p>![image-20211222000945553](Games202-Lecture4 Real-Time-Shadow2/image-20211222000945553.png)</p><p>对于二维情况，我们可以使用区域相加减的方式得出任意一个矩形区域的和。通过观察可以得出，相加减的项都是从左上角出发的。因此我们需要一张表，表中记录了从左上角到当前顶点的深度和。基于此，在计算中只需要查四次表就行了。实际上我们只需要先每一行中每一项进行相加计算前缀和，在此基础上每一列再分别计算前缀和，得到的即为一张SAT表。</p><h1 id="VSSM的改良"><a href="#VSSM的改良" class="headerlink" title="VSSM的改良"></a>VSSM的改良</h1><p>![image-20211222003724948](Games202-Lecture4 Real-Time-Shadow2/image-20211222003724948.png)</p><p>VSSM基于了太多假设，正态分布对于有些情况并不适用。如图光线穿过孔洞，得到三个峰值，不可能用一个正态分布峰值去拟合。</p><p>![image-20211222003845515](Games202-Lecture4 Real-Time-Shadow2/image-20211222003845515.png)</p><p>蓝色为实际遮挡物的深度分布，红色为正态分布拟合。可以看出我们假设有红色阴影区域的部分深度大，挡不住，但实际上只有蓝色阴影区域的很少一部分挡不住。对于镂空等形状这种误差尤为严重。</p><p>![image-20211222004059362](Games202-Lecture4 Real-Time-Shadow2/image-20211222004059362.png)</p><p>车底很明显有很浅的阴影区域。</p><p>![image-20211222004246188](Games202-Lecture4 Real-Time-Shadow2/image-20211222004246188.png)</p><p>对于以上问题，采用使用更高阶的矩来解决。</p><p>![image-20211222004315841](Games202-Lecture4 Real-Time-Shadow2/image-20211222004315841.png)</p><p>最简单的矩，我们记录某一个数的各种次方，保留前多少阶的矩。对于VSSM，我们只用了前两阶的矩。</p><p>![image-20211222004633250](Games202-Lecture4 Real-Time-Shadow2/image-20211222004633250.png)</p><p>保留前m个矩，可以使用阶跃函数保存m/2个阶。正常情况下使用四阶矩就足够了。</p><p>![image-20211222004842455](Games202-Lecture4 Real-Time-Shadow2/image-20211222004842455.png)</p><p>Moment Shadow Mapping做的工作就是在原VSSM的基础上做更高阶的矩 </p>]]></content>
+    
+    
+    <categories>
+      
+      <category>计算机图形学</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Games202</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Games202-Lecture3 Real-Time-Shadow 1</title>
     <link href="/2021/12/20/Games202-Lecture3/"/>
     <url>/2021/12/20/Games202-Lecture3/</url>
