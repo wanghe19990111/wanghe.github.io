@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>Games202-Lecture5 Environment Mapping</title>
+    <link href="/2022/07/25/Games202-Lecture5/"/>
+    <url>/2022/07/25/Games202-Lecture5/</url>
+    
+    <content type="html"><![CDATA[<h1 id="SDF"><a href="#SDF" class="headerlink" title="SDF"></a>SDF</h1><img src="/2022/07/25/Games202-Lecture5/image-20220725113942078.png" alt="image-20220725113942078" style="zoom: 80%;"><p>SDF: signed distance field   有向距离场  存储该位置到附近表面的最短距离 正负号代表物体内外</p><p>上图为SDF处理软阴影的效果（下面有具体说明）</p><img src="/2022/07/25/Games202-Lecture5/image-20220725114142706.png" alt="image-20220725114142706" style="zoom:80%;"><p>左图为SDF生成距离场的可视化效果图，在A内部距离为负的涂全黑，在A外部距离越远，颜色越浅。右图为另一种等高线距离场的画法。</p><img src="/2022/07/25/Games202-Lecture5/image-20220725114405023.png" alt="image-20220725114405023" style="zoom:80%;"><p>图A中有一个黑色物体向右匀速移动，图B为一段时间后物体的移动位置。现在需要求在中间时刻物体的位置：</p><p>​1）在101中讲过普通的线性插值方法，对同一个像素的两个不同时间的颜色进行差值，得到的效果为lerp(A,B)。可以看出插值结果为灰色，不符合要求。</p><p>​2）通过模拟距离场进行差值。黑色内距离为负，白色内距离为正(物体外)。离交界面越远，距离的绝对值越大。此时再次对像素进行距离差值，得到右下图的效果，符合要求。</p><img src="/2022/07/25/Games202-Lecture5/image-20220725115242176.png" alt="image-20220725115242176" style="zoom:80%;"><p>如图为距离场的另一种应用：物体融合。更详细的理解可以查看”最优传输”技术，在这里不再赘述。</p><h2 id="SDF-Ray-Marching"><a href="#SDF-Ray-Marching" class="headerlink" title="SDF Ray Marching"></a>SDF Ray Marching</h2><img src="/2022/07/25/Games202-Lecture5/image-20220725125111631.png" alt="image-20220725125111631" style="zoom:80%;"><p><strong>光线步进(Ray Marching)<strong>有时也被称为</strong>球体追踪(Sphere Tracing)</strong>, 因为每次都是检测球形内的物体。使用三维空间内的SDF可以实现最大效率的不定长光线步进。每个SDF存储以该点为球心，距离为半径的球体，球体与最近表面相切且内部一定是空的。因此光线步进的这个半径距离也称为安全距离。</p><p>Sphere Tracing 缺点：光线延物体表面步进时步长会特别短，计算量很大；三维SDF需预计算，计算量大，存储信息巨量，且当场景内物体发生形变时更新困难。SDF生成表面不好贴纹理</p><p>优化：场景中多个物体可以分别单独计算SDF，整合时每个点取每个物体最小的SDF。</p><p>​采用类似八叉树的方式进行存储</p><h2 id="SDF-生成软阴影"><a href="#SDF-生成软阴影" class="headerlink" title="SDF 生成软阴影"></a>SDF 生成软阴影</h2><img src="/2022/07/25/Games202-Lecture5/image-20220725130237059.png" alt="image-20220725130237059" style="zoom:80%;"><p>主要思想：通过SDF得到一个大概的 <strong>遮挡百分比</strong>，用1减去它就得到visibility项</p><p>引入<strong>安全角度</strong>：从地面上的某一shading point向一方向发射一条光线，光线在空中某一点(最小SDF点？)的SDF会构成一个球体。该球体的切线与原始光线的夹角称为安全角度。</p><p>渲染阴影时</p><ul><li><strong><code>safe angle越小，阴影越深。</code></strong></li><li><strong><code>safe angle越大，阴影越浅。</code></strong></li></ul><img src="/2022/07/25/Games202-Lecture5/image-20220725131956064.png" alt="image-20220725131956064" style="zoom:80%;"><p>多个遮挡物或多个采样点时，采用之前提到的SDF步进方式，取最小的安全角度为该shading point的软阴影程度。</p><img src="/2022/07/25/Games202-Lecture5/image-20220725132803209.png" alt="image-20220725132803209" style="zoom:80%;"><p>通常来讲，采用反三角函数的方式可以得到安全角度的值，但是计算量太大、由于可以采用近似方法计算软阴影，即得到的visibility可以不必那么精确。因此直接采用比值的方式求得，大小不超过1。引入系数k来控制阴影的软硬程度。k越小，很大的安全角度也会被纳入阴影之中(只是比较软)；k越大，很小的安全角度也可能算出来的值超过1而被舍弃，不计算阴影。因此k值越大，阴影范围越小，阴影越硬。</p><h1 id="Environment-Lighting-环境光照"><a href="#Environment-Lighting-环境光照" class="headerlink" title="Environment Lighting 环境光照"></a>Environment Lighting 环境光照</h1><img src="/2022/07/25/Games202-Lecture5/image-20220725135605293.png" alt="image-20220725135605293" style="zoom:80%;"><p>环境光照：使用一张图来存储在场景中向任意方向看去，所获得的光照。假设无限远。</p><p>扩展：主流两种存储方式：spherical map与cube map</p><p>spherical map：采用球体存储，相机无限远，盲区逐渐收缩成一个点，因此存储的内容为整个环境光照排除一个点。优点：只需要一张贴图；缺点：非线性分布映射，还原困难，中心区域精度最高，四周到背面精度低。</p><p>cube map：立方体盒，六个不同方向的贴图合并成一个立方体。使用时立方体中心与光线原点重合，当方向向量向外延伸时，就会和立方体表面上的相应纹理发生相交，我们可以根据该交点结合立方体的方向向量进行采样。</p><p><img src="/GAMES202_Lecture_05/70.png" alt="这里写图片描述"></p><img src="/2022/07/25/Games202-Lecture5/image-20220725142021500.png" alt="image-20220725142021500" style="zoom:80%;"><p>环境光照不需要考虑visibility，从IBL图中可以直接得到shading point 的Li，因此我们的任务就是解渲染方程！</p><img src="/2022/07/25/Games202-Lecture5/image-20220725142212468.png" alt="image-20220725142212468" style="zoom:80%;"><p>经典解法：蒙特卡洛积分：对于任何积分可以用大量样本进行近似，计算量巨大。因此不太可能用于实时渲染。如何避免sampling(采样)？</p><img src="/2022/07/25/Games202-Lecture5/image-20220725144102312.png" alt="image-20220725144102312" style="zoom:80%;"><p>满足化简条件，可以进行积分乘积化简，结果如下：</p><img src="/2022/07/25/Games202-Lecture5/image-20220725144145690.png" alt="image-20220725144145690" style="zoom:80%;"><p>将Li提出来进行积分乘积化简，不同于上节计算shadow时提的visibility项。注意都要<strong>归一化</strong>！</p><img src="/2022/07/25/Games202-Lecture5/image-20220725144414375.png" alt="image-20220725144414375" style="zoom:80%;"><p>方程实质上是取照射到某一点的一小部分光线，在球面一定面积上进行BRDF，再将结果写回该点。可以理解为BRDF用不同滤波的核生成的Mipmap，结果就是图像越来越模糊。prefilter图像滤波？</p><img src="/2022/07/25/Games202-Lecture5/image-20220725145139591.png" alt="image-20220725145139591" style="zoom:80%;"><p>这样做的好处：以前当我们需要计算一个point的BRDF(及某一个lobe波瓣）时可能会需要很多分布点进行采样，然后加权平均。现在可以直接取镜面反射的方向上的一个值，mipmap大小根据lobe大小而定。</p><img src="/2022/07/25/Games202-Lecture5/image-20220725150006356.png" alt="image-20220725150006356" style="zoom:80%;"><p>基于以上，我们解决了化简后的BRDF方程乘积的前一项：即环境光照充当入射光，在某一点的入射光如何计算的问题。我们先refilter生成了不同模糊度的环境光照贴图，根据波瓣大小直接使用对应的贴图。那么如何解决后一项BRDF的积分？</p><img src="/2022/07/25/Games202-Lecture5/image-20220725152645692.png" alt="image-20220725152645692" style="zoom:80%;"><p>将F菲涅尔项带入，乘积拆开后可以化简为两个参数的函数：roughness与角Θ</p><p>后面真听不懂了。。。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>计算机图形学</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Games202</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Games202-Lecture4 Real-Time-Shadow 2</title>
     <link href="/2021/12/22/Games202-Lecture4/"/>
     <url>/2021/12/22/Games202-Lecture4/</url>
