@@ -32,7 +32,6 @@
 <meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture5/image-20220725131956064.png">
 <meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture5/image-20220725132803209.png">
 <meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture5/image-20220725135605293.png">
-<meta property="og:image" content="https://www.wangheblog.cn/GAMES202_Lecture_05/70.png">
 <meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture5/image-20220725142021500.png">
 <meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture5/image-20220725142212468.png">
 <meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture5/image-20220725144102312.png">
@@ -42,7 +41,7 @@
 <meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture5/image-20220725150006356.png">
 <meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture5/image-20220725152645692.png">
 <meta property="article:published_time" content="2022-07-25T09:17:00.000Z">
-<meta property="article:modified_time" content="2022-07-25T09:51:53.812Z">
+<meta property="article:modified_time" content="2022-07-25T10:43:42.232Z">
 <meta property="article:author" content="Wang He">
 <meta property="article:tag" content="Games202">
 <meta name="twitter:card" content="summary_large_image">
@@ -265,7 +264,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：4 分钟前
+                  本文最后更新于：几秒前
                 
               </p>
             
@@ -314,7 +313,6 @@
 <p>扩展：主流两种存储方式：spherical map与cube map</p>
 <p>spherical map：采用球体存储，相机无限远，盲区逐渐收缩成一个点，因此存储的内容为整个环境光照排除一个点。优点：只需要一张贴图；缺点：非线性分布映射，还原困难，中心区域精度最高，四周到背面精度低。</p>
 <p>cube map：立方体盒，六个不同方向的贴图合并成一个立方体。使用时立方体中心与光线原点重合，当方向向量向外延伸时，就会和立方体表面上的相应纹理发生相交，我们可以根据该交点结合立方体的方向向量进行采样。</p>
-<p><img src="/GAMES202_Lecture_05/70.png" srcset="/img/loading.gif" lazyload alt="这里写图片描述"></p>
 <img src="/2022/07/25/Games202-Lecture5/image-20220725142021500.png" srcset="/img/loading.gif" lazyload alt="image-20220725142021500" style="zoom:80%;">
 
 <p>环境光照不需要考虑visibility，从IBL图中可以直接得到shading point 的Li，因此我们的任务就是解渲染方程！</p>
