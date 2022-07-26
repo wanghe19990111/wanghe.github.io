@@ -19,21 +19,21 @@
   <meta name="description" content="Environment lighting shadow 环境光照如何计算阴影？有两个问题 1.many light问题:我们把环境光理解为很多个小的光源,这种情况下去生成阴影的话,需要在每个小光源下生成shadow map,因此会生成线性于光源数量的shadow map,这是十分高昂的代价. 2.sampling问题:在任何一个Shading point上已知来自正半球方向的光照去接renderi">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Games202-Lecture6 Environment Mapping">
-<meta property="og:url" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture6/index.html">
+<meta property="og:url" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/index.html">
 <meta property="og:site_name" content="王贺的博客">
 <meta property="og:description" content="Environment lighting shadow 环境光照如何计算阴影？有两个问题 1.many light问题:我们把环境光理解为很多个小的光源,这种情况下去生成阴影的话,需要在每个小光源下生成shadow map,因此会生成线性于光源数量的shadow map,这是十分高昂的代价. 2.sampling问题:在任何一个Shading point上已知来自正半球方向的光照去接renderi">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://www.wangheblog.cn/Games202-Lecture6/image-20220726103357038.png">
-<meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture6/image-20220726104355947.png">
-<meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture6/image-20220726104513501.png">
-<meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture6/image-20220726104638130.png">
-<meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture6/image-20220726104723479.png">
-<meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture6/image-20220726105344701.png">
-<meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture6/image-20220726105525594.png">
-<meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture6/image-20220726114634292.png">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726104355947.png">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726104513501.png">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726104638130.png">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726104723479.png">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726105344701.png">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726105525594.png">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726114634292.png">
 <meta property="og:image" content="https://www.zhihu.com/equation?tex=%5Ctheta++++">
 <meta property="og:image" content="https://www.zhihu.com/equation?tex=++%5Cvarphi">
-<meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture6/image-20220726114705858.png">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726114705858.png">
 <meta property="og:image" content="https://www.zhihu.com/equation?tex=2l+1">
 <meta property="og:image" content="https://www.zhihu.com/equation?tex=n%5E2">
 <meta property="og:image" content="https://www.zhihu.com/equation?tex=-l">
@@ -41,8 +41,8 @@
 <meta property="og:image" content="https://www.zhihu.com/equation?tex=f(w)">
 <meta property="og:image" content="https://www.wangheblog.cn/Games202-Lecture6/v2-67b41abfd72432eb4f7a422f4be9a013_720w.png">
 <meta property="og:image" content="https://www.wangheblog.cn/Games202-Lecture6/v2-29ee61ce4bbc3bb72154034469da0939_720w.png">
-<meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture6/image-20220726142300864.png">
-<meta property="og:image" content="https://www.wangheblog.cn/2022/07/25/Games202-Lecture6/image-20220726150700435.png">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726142300864.png">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726150700435.png">
 <meta property="og:image" content="https://www.wangheblog.cn/Games202-Lecture6/v2-ac89de64010d5e44c6965bde98867b83_720w.jpg">
 <meta property="og:image" content="https://www.wangheblog.cn/Games202-Lecture6/v2-a73f305b4ce3a40765ba81291217a0c4_720w.jpg">
 <meta property="og:image" content="https://www.wangheblog.cn/Games202-Lecture6/v2-063db9e7d2ec8701b04a7cec91f4bfbb_720w.jpg">
@@ -54,8 +54,8 @@
 <meta property="og:image" content="https://pic4.zhimg.com/80/v2-318c5c351b31b595af6454caabfdd04b_720w.jpg">
 <meta property="og:image" content="https://pic3.zhimg.com/80/v2-130a4f57f42036c2d1ea9d489d60684a_720w.jpg">
 <meta property="og:image" content="https://pic4.zhimg.com/80/v2-1499b4c16aee149846108b79d6cd63b7_720w.jpg">
-<meta property="article:published_time" content="2022-07-25T09:17:00.000Z">
-<meta property="article:modified_time" content="2022-07-26T07:44:48.000Z">
+<meta property="article:published_time" content="2022-07-26T07:53:00.000Z">
+<meta property="article:modified_time" content="2022-07-26T07:54:10.244Z">
 <meta property="article:author" content="Wang He">
 <meta property="article:tag" content="Games202">
 <meta name="twitter:card" content="summary_large_image">
@@ -217,8 +217,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2022-07-25 17:17" pubdate>
-        2022年7月25日 下午
+      <time datetime="2022-07-26 15:53" pubdate>
+        2022年7月26日 下午
       </time>
     </span>
   
@@ -278,7 +278,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：5 分钟前
+                  本文最后更新于：几秒前
                 
               </p>
             
@@ -287,29 +287,29 @@
 <p>环境光照如何计算阴影？有两个问题</p>
 <p>1.many light问题:我们把环境光理解为很多个小的光源,这种情况下去生成阴影的话,需要在每个小光源下生成shadow map,因此会生成线性于光源数量的shadow map,这是十分高昂的代价.</p>
 <p>2.sampling问题:在任何一个Shading point上已知来自正半球方向的光照去接rendering equation,最简单的方法是采样空间中各方向上的不同光照,可以做重要性采样,虽然做了重要性采样但仍需要大量的样本,因为最困难的是visibility term.由于Shading point不同方向上的遮挡是不相同的,我们可以对环境光照进行重要性采样,但一个SP周围的visibility项是未知的,因此我们只能盲目的去采样(我个人对盲目采样的理解是,为了确保准确性需要对sp各个方向的遮挡进行采样,因此仍然会生成大量的样本).我们也无法提取出visibility项,因为如果是glossy brdf,他是一个高频的,且Lighting项的积分域是整个半球,因此并不满足smooth或small support,因此无法提取出visibility项.</p>
-<h1 id="基础知识回顾"><a href="#基础知识回顾" class="headerlink" title="基础知识回顾"></a>基础知识回顾</h1><img src="/2022/07/25/Games202-Lecture6/image-20220726104355947.png" srcset="/img/loading.gif" lazyload alt="image-20220726104355947" style="zoom:80%;">
+<h1 id="基础知识回顾"><a href="#基础知识回顾" class="headerlink" title="基础知识回顾"></a>基础知识回顾</h1><img src="/2022/07/26/Games202-Lecture6/image-20220726104355947.png" srcset="/img/loading.gif" lazyload alt="image-20220726104355947" style="zoom:80%;">
 
 <p>傅里叶展开：任何一个函数都可以用常数与sin、cos的和进行拟合，基函数越多，拟合效果越好。</p>
-<img src="/2022/07/25/Games202-Lecture6/image-20220726104513501.png" srcset="/img/loading.gif" lazyload alt="image-20220726104513501" style="zoom:80%;">
+<img src="/2022/07/26/Games202-Lecture6/image-20220726104513501.png" srcset="/img/loading.gif" lazyload alt="image-20220726104513501" style="zoom:80%;">
 
 <p>变化越剧烈的地方，频率越高。任何一张图(也就是二维函数)的频率,也就是频域上对应的内容可以用一张频谱表示出来。</p>
-<img src="/2022/07/25/Games202-Lecture6/image-20220726104638130.png" srcset="/img/loading.gif" lazyload alt="image-20220726104638130" style="zoom:80%;">
+<img src="/2022/07/26/Games202-Lecture6/image-20220726104638130.png" srcset="/img/loading.gif" lazyload alt="image-20220726104638130" style="zoom:80%;">
 
 <p>频谱最中心处是低频内容,我们可以做一个filtering(滤波),从而去除一系列频率上的内容,我们对这张图用一个低通滤波器,从而把高频的内容去除掉.</p>
-<img src="/2022/07/25/Games202-Lecture6/image-20220726104723479.png" srcset="/img/loading.gif" lazyload alt="image-20220726104723479" style="zoom:80%;">
+<img src="/2022/07/26/Games202-Lecture6/image-20220726104723479.png" srcset="/img/loading.gif" lazyload alt="image-20220726104723479" style="zoom:80%;">
 
 <p>所谓卷积，实际上就是一种模糊操作，取周围像素进行平均之后写回原像素。如图为均值滤波。</p>
-<img src="/2022/07/25/Games202-Lecture6/image-20220726105344701.png" srcset="/img/loading.gif" lazyload alt="image-20220726105344701" style="zoom:80%;">
+<img src="/2022/07/26/Games202-Lecture6/image-20220726105344701.png" srcset="/img/loading.gif" lazyload alt="image-20220726105344701" style="zoom:80%;">
 
 <p>对于任意的product integral(两个函数先乘积在积分),我们将其认为是做了一个卷积操作,理解为spatial域上的两个信号f(x)和g(x)进行一个卷积,等于在频域上让两个信号相乘,如果两个信号有一个信号是低频的,那么频域上相乘后得到的结果也是低频的,最终相乘在积分的结果也是低频的,可以总结为：<strong>积分之后的频率取决于积分前最低的频率，即the frequency of the integral is the lowest of any individual’s</strong>。</p>
 <p>低频意味着变换更加地smooth或者有着slow的变化。</p>
-<img src="/2022/07/25/Games202-Lecture6/image-20220726105525594.png" srcset="/img/loading.gif" lazyload alt="image-20220726105525594" style="zoom:80%;">
+<img src="/2022/07/26/Games202-Lecture6/image-20220726105525594.png" srcset="/img/loading.gif" lazyload alt="image-20220726105525594" style="zoom:80%;">
 
 <p>基函数：本质上就是一系列函数，他们的线性组合可以描述某个函数。</p>
 <p>回归正题,我们要讨论的是如何在环境光照下生成阴影,先从最简单的开始,如果给了你环境光和一个diffuse的物体,在不考虑Shadow的情况下如何去计算shading值?</p>
 <p>为了计算shading值,我们引入数学工具—–&gt;Spherical Harmonics(球谐函数)</p>
 <p>在游戏渲染中,SH有很多应用.比如SH可以用来表示低频部分的环境光照,也可以用来提供light probe的烘培光照等等..</p>
-<h1 id="Spherical-Harmonics-球谐函数"><a href="#Spherical-Harmonics-球谐函数" class="headerlink" title="Spherical Harmonics(球谐函数)"></a><em>Spherical Harmonics(球谐函数)</em></h1><img src="/2022/07/25/Games202-Lecture6/image-20220726114634292.png" srcset="/img/loading.gif" lazyload alt="image-20220726114634292" style="zoom:80%;">
+<h1 id="Spherical-Harmonics-球谐函数"><a href="#Spherical-Harmonics-球谐函数" class="headerlink" title="Spherical Harmonics(球谐函数)"></a><em>Spherical Harmonics(球谐函数)</em></h1><img src="/2022/07/26/Games202-Lecture6/image-20220726114634292.png" srcset="/img/loading.gif" lazyload alt="image-20220726114634292" style="zoom:80%;">
 
 <p>SH是一系列基函数,系列中的每个函数都是2维函数,并且每个二维函数都是定义在球面上的。</p>
 <p>1.它是一系列的基函数，可以以傅立叶变换为参考,与里面不同频率的cos和sin函数类似,只是全都是二维函数</p>
@@ -317,7 +317,7 @@
 <p>上图是对SH的可视化，与一维的傅里叶一样,SH也存在不同频率的函数，但不同频率的函数个数也不同,频率越高所含有的基函数越多。</p>
 <p>图中的颜色表示的是值的大小,l&#x3D;0中,越偏白的蓝色地方值越大,越黑的地方值越小.而黄色中则表示偏白的地方表示其绝对值大,偏黑的地方表示绝对值小.也就是蓝色表示正,黄色表示负.</p>
 <p>频率表示的就是值的变化,因此可以很清晰的从形状看出.</p>
-<img src="/2022/07/25/Games202-Lecture6/image-20220726114705858.png" srcset="/img/loading.gif" lazyload alt="image-20220726114705858" style="zoom:80%;">
+<img src="/2022/07/26/Games202-Lecture6/image-20220726114705858.png" srcset="/img/loading.gif" lazyload alt="image-20220726114705858" style="zoom:80%;">
 
 <p>其中，l表示的是阶数，通常第l阶有<img src="https://www.zhihu.com/equation?tex=2l+1" srcset="/img/loading.gif" lazyload alt="[公式]">个基函数，前n阶有<img src="https://www.zhihu.com/equation?tex=n%5E2" srcset="/img/loading.gif" lazyload alt="[公式]">个基函数，m表示的是在某一个频率下基函数的序号，分别从从<img src="https://www.zhihu.com/equation?tex=-l" srcset="/img/loading.gif" lazyload alt="[公式]">一直到<img src="https://www.zhihu.com/equation?tex=l" srcset="/img/loading.gif" lazyload alt="[公式]">。每个基函数都有一个比较复杂的数学表示，对应一个legendre多项式，我们不用去了解legendre多项式,我们只需要知道基函数长这样,可以被某些数学公式来定义不同方向的值是多少就可以了.</p>
 <p>下面定义一些操作：</p>
@@ -328,10 +328,10 @@
 <p>由于基函数的阶可以是无限个的，越高的阶可恢复的细节就越好,但一方面是因为更多的系数会带来更大的存储压力、计算压力，而一般描述变化比较平滑的环境漫反射部分，用3阶SH就足够了；另一方面则是因为SH的物理含义不是特别好理解，高阶SH容易出现各种花式Artifact，美术同学一般都会认为这种表现属于bug。</p>
 <p><img src="/Games202-Lecture6/v2-29ee61ce4bbc3bb72154034469da0939_720w.png" srcset="/img/loading.gif" lazyload alt="img"></p>
 <p>f(w)可以是任何一个函数,我们说过基函数可以重建任何一个球面函数,那么我们这里的f(w)就是环境光照,由于环境光是来自于四面八方且都有值,所以环境光照就是一个球面函数,,我们可以把它投影到任何一个SH basis上,可以投影很多阶,但是只需要取前三阶的SH去恢复环境光就可以恢复出最低频的细节了,这个在下文RAVI教授的结论有提到.</p>
-<img src="/2022/07/25/Games202-Lecture6/image-20220726142300864.png" srcset="/img/loading.gif" lazyload alt="image-20220726142300864" style="zoom:80%;">
+<img src="/2022/07/26/Games202-Lecture6/image-20220726142300864.png" srcset="/img/loading.gif" lazyload alt="image-20220726142300864" style="zoom:80%;">
 
 <p>Ravi教授等人在01年左右做过一些实验发现，diffuse BRDF类似于一个低通滤波器，使用一些低频信息就可以恢复出原始内容。回忆一下，在本文之前的内容中曾说过：“<strong>积分之后的频率取决于积分前最低的频率</strong>”，当diffuse BRDF使用低频信息即可恢复内容时，也就意味着无论光照项是多么复杂，其本应该用多高频的基函数去表示，但我们希望得到的是其与BRDF之积的积分，所以可以使用比较低频的基函数去描述灯光。下面的实验结果意味着，遇到diffuse的物体时使用前3阶的球谐基函数就可以基本重建出正确率99%的结果，因为diffuse基本都是低频。</p>
-<h1 id="Precomputed-Radiance-Transfer-PRT"><a href="#Precomputed-Radiance-Transfer-PRT" class="headerlink" title="Precomputed Radiance Transfer(PRT)"></a>Precomputed Radiance Transfer(PRT)</h1><img src="/2022/07/25/Games202-Lecture6/image-20220726150700435.png" srcset="/img/loading.gif" lazyload alt="image-20220726150700435" style="zoom:80%;">
+<h1 id="Precomputed-Radiance-Transfer-PRT"><a href="#Precomputed-Radiance-Transfer-PRT" class="headerlink" title="Precomputed Radiance Transfer(PRT)"></a>Precomputed Radiance Transfer(PRT)</h1><img src="/2022/07/26/Games202-Lecture6/image-20220726150700435.png" srcset="/img/loading.gif" lazyload alt="image-20220726150700435" style="zoom:80%;">
 
 <p>BRDF:四维函数，入射出射分别有两个角</p>
 <p>显而易见，我们可以把渲染方程拆解为三项的乘积：lighting、visibility与BRDF。三者都是球面函数，可以用cube来表示。那么最简单的方法就是每个像素挨个去乘，当然这样做的话消耗太大了。假设cube分辨率为6*64*64，那么每个SP我们都要计算6*64*64次。</p>
@@ -403,18 +403,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/07/25/Games202-Lecture5/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Games202-Lecture5 Environment Mapping</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2021/12/22/Games202-Lecture4/">
-                        <span class="hidden-mobile">Games202-Lecture4 Real-Time-Shadow 2</span>
+                      <a href="/2022/07/25/Games202-Lecture5/">
+                        <span class="hidden-mobile">Games202-Lecture5 Environment Mapping</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

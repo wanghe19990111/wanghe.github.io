@@ -190,27 +190,21 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2022/07/25/Games202-Lecture5/" target="_self">
-          Games202-Lecture5 Environment Mapping
+        <a href="/2022/07/26/Games202-Lecture6/" target="_self">
+          Games202-Lecture6 Environment Mapping
         </a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/2022/07/25/Games202-Lecture5/" target="_self">
+        <a href="/2022/07/26/Games202-Lecture6/" target="_self">
           
           
             
           
-          SDF
-
-SDF: signed distance field   有向距离场  存储该位置到附近表面的最短距离 正负号代表物体内外
-上图为SDF处理软阴影的效果（下面有具体说明）
-
-
-左图为SDF生成距离场的可视化效果图，在A内部距离为负的涂全黑，在A外部距离越远，颜色越浅。右图为另一种等高线距离场的画法。
-
-
-图A中有一个黑色物体向右匀速移动，图B为一段时间后物体的移动位置。现在需要求在中间时
+          Environment lighting shadow
+环境光照如何计算阴影？有两个问题
+1.many light问题:我们把环境光理解为很多个小的光源,这种情况下去生成阴影的话,需要在每个小光源下生成shadow map,因此会生成线性于光源数量的shadow map,这是十分高昂的代价.
+2.sampling问题:在任何一个Shading point上已知来自正半球方向的光照去接renderi
         </a>
       </p>
 
@@ -218,8 +212,8 @@ SDF: signed distance field   有向距离场  存储该位置到附近表面的�
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2022-07-25 17:17" pubdate>
-              2022-07-25
+            <time datetime="2022-07-26 15:53" pubdate>
+              2022-07-26
             </time>
           </div>
         
@@ -249,21 +243,27 @@ SDF: signed distance field   有向距离场  存储该位置到附近表面的�
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2022/07/25/Games202-Lecture6/" target="_self">
-          Games202-Lecture6 Environment Mapping
+        <a href="/2022/07/25/Games202-Lecture5/" target="_self">
+          Games202-Lecture5 Environment Mapping
         </a>
       </h1>
 
       <p class="index-excerpt">
-        <a href="/2022/07/25/Games202-Lecture6/" target="_self">
+        <a href="/2022/07/25/Games202-Lecture5/" target="_self">
           
           
             
           
-          Environment lighting shadow
-环境光照如何计算阴影？有两个问题
-1.many light问题:我们把环境光理解为很多个小的光源,这种情况下去生成阴影的话,需要在每个小光源下生成shadow map,因此会生成线性于光源数量的shadow map,这是十分高昂的代价.
-2.sampling问题:在任何一个Shading point上已知来自正半球方向的光照去接renderi
+          SDF
+
+SDF: signed distance field   有向距离场  存储该位置到附近表面的最短距离 正负号代表物体内外
+上图为SDF处理软阴影的效果（下面有具体说明）
+
+
+左图为SDF生成距离场的可视化效果图，在A内部距离为负的涂全黑，在A外部距离越远，颜色越浅。右图为另一种等高线距离场的画法。
+
+
+图A中有一个黑色物体向右匀速移动，图B为一段时间后物体的移动位置。现在需要求在中间时
         </a>
       </p>
 
