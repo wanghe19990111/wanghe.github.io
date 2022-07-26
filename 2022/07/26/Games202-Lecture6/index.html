@@ -16,14 +16,14 @@
   <meta name="description" content="">
   <meta name="author" content="Wang He">
   <meta name="keywords" content="">
-  <meta name="description" content="Environment lighting shadow 环境光照如何计算阴影？有两个问题 1.many light问题:我们把环境光理解为很多个小的光源,这种情况下去生成阴影的话,需要在每个小光源下生成shadow map,因此会生成线性于光源数量的shadow map,这是十分高昂的代价. 2.sampling问题:在任何一个Shading point上已知来自正半球方向的光照去接renderi">
+  <meta name="description" content="Environment lighting shadow  环境光照如何计算阴影？有两个问题 1.many light问题:我们把环境光理解为很多个小的光源,这种情况下去生成阴影的话,需要在每个小光源下生成shadow map,因此会生成线性于光源数量的shadow map,这是十分高昂的代价. 2.sampling问题:在任何一个Shading point上已知来自正半球方向的光照去接render">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Games202-Lecture6 Environment Mapping">
 <meta property="og:url" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/index.html">
 <meta property="og:site_name" content="王贺的博客">
-<meta property="og:description" content="Environment lighting shadow 环境光照如何计算阴影？有两个问题 1.many light问题:我们把环境光理解为很多个小的光源,这种情况下去生成阴影的话,需要在每个小光源下生成shadow map,因此会生成线性于光源数量的shadow map,这是十分高昂的代价. 2.sampling问题:在任何一个Shading point上已知来自正半球方向的光照去接renderi">
+<meta property="og:description" content="Environment lighting shadow  环境光照如何计算阴影？有两个问题 1.many light问题:我们把环境光理解为很多个小的光源,这种情况下去生成阴影的话,需要在每个小光源下生成shadow map,因此会生成线性于光源数量的shadow map,这是十分高昂的代价. 2.sampling问题:在任何一个Shading point上已知来自正半球方向的光照去接render">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://www.wangheblog.cn/Games202-Lecture6/image-20220726103357038.png">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726103357038.png">
 <meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726104355947.png">
 <meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726104513501.png">
 <meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726104638130.png">
@@ -39,14 +39,14 @@
 <meta property="og:image" content="https://www.zhihu.com/equation?tex=-l">
 <meta property="og:image" content="https://www.zhihu.com/equation?tex=l">
 <meta property="og:image" content="https://www.zhihu.com/equation?tex=f(w)">
-<meta property="og:image" content="https://www.wangheblog.cn/Games202-Lecture6/v2-67b41abfd72432eb4f7a422f4be9a013_720w.png">
-<meta property="og:image" content="https://www.wangheblog.cn/Games202-Lecture6/v2-29ee61ce4bbc3bb72154034469da0939_720w.png">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/v2-67b41abfd72432eb4f7a422f4be9a013_720w.png">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/v2-29ee61ce4bbc3bb72154034469da0939_720w.png">
 <meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726142300864.png">
 <meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726150700435.png">
-<meta property="og:image" content="https://www.wangheblog.cn/Games202-Lecture6/v2-ac89de64010d5e44c6965bde98867b83_720w.jpg">
-<meta property="og:image" content="https://www.wangheblog.cn/Games202-Lecture6/v2-a73f305b4ce3a40765ba81291217a0c4_720w.jpg">
-<meta property="og:image" content="https://www.wangheblog.cn/Games202-Lecture6/v2-063db9e7d2ec8701b04a7cec91f4bfbb_720w.jpg">
-<meta property="og:image" content="https://www.wangheblog.cn/Games202-Lecture6/v2-3140646120f0f4b79b851e94394a4336_720w.jpg">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/v2-ac89de64010d5e44c6965bde98867b83_720w.jpg">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/v2-a73f305b4ce3a40765ba81291217a0c4_720w.jpg">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/v2-063db9e7d2ec8701b04a7cec91f4bfbb_720w.jpg">
+<meta property="og:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/v2-3140646120f0f4b79b851e94394a4336_720w.jpg">
 <meta property="og:image" content="https://www.zhihu.com/equation?tex=l_%7B1%7DT_%7B1%7D">
 <meta property="og:image" content="https://www.zhihu.com/equation?tex=l_%7B2%7DT_%7B2%7D">
 <meta property="og:image" content="https://pic1.zhimg.com/80/v2-1af5b28f676ada1377b7be890d0b3450_720w.jpg">
@@ -54,12 +54,12 @@
 <meta property="og:image" content="https://pic4.zhimg.com/80/v2-318c5c351b31b595af6454caabfdd04b_720w.jpg">
 <meta property="og:image" content="https://pic3.zhimg.com/80/v2-130a4f57f42036c2d1ea9d489d60684a_720w.jpg">
 <meta property="og:image" content="https://pic4.zhimg.com/80/v2-1499b4c16aee149846108b79d6cd63b7_720w.jpg">
-<meta property="article:published_time" content="2022-07-26T07:53:00.000Z">
-<meta property="article:modified_time" content="2022-07-26T07:54:10.244Z">
+<meta property="article:published_time" content="2022-07-26T07:58:00.000Z">
+<meta property="article:modified_time" content="2022-07-26T07:58:48.000Z">
 <meta property="article:author" content="Wang He">
 <meta property="article:tag" content="Games202">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://www.wangheblog.cn/Games202-Lecture6/image-20220726103357038.png">
+<meta name="twitter:image" content="https://www.wangheblog.cn/2022/07/26/Games202-Lecture6/image-20220726103357038.png">
   
   <title>Games202-Lecture6 Environment Mapping - 王贺的博客</title>
 
@@ -217,7 +217,7 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2022-07-26 15:53" pubdate>
+      <time datetime="2022-07-26 15:58" pubdate>
         2022年7月26日 下午
       </time>
     </span>
@@ -278,12 +278,13 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：1 分钟前
+                  本文最后更新于：几秒前
                 
               </p>
             
             <div class="markdown-body">
-              <h1 id="Environment-lighting-shadow"><a href="#Environment-lighting-shadow" class="headerlink" title="Environment lighting shadow"></a>Environment lighting shadow</h1><p><img src="/Games202-Lecture6/image-20220726103357038.png" srcset="/img/loading.gif" lazyload alt="image-20220726103357038"></p>
+              <h1 id="Environment-lighting-shadow"><a href="#Environment-lighting-shadow" class="headerlink" title="Environment lighting shadow"></a>Environment lighting shadow</h1><img src="/2022/07/26/Games202-Lecture6/image-20220726103357038.png" srcset="/img/loading.gif" lazyload alt="image-20220726103357038" style="zoom:80%;">
+
 <p>环境光照如何计算阴影？有两个问题</p>
 <p>1.many light问题:我们把环境光理解为很多个小的光源,这种情况下去生成阴影的话,需要在每个小光源下生成shadow map,因此会生成线性于光源数量的shadow map,这是十分高昂的代价.</p>
 <p>2.sampling问题:在任何一个Shading point上已知来自正半球方向的光照去接rendering equation,最简单的方法是采样空间中各方向上的不同光照,可以做重要性采样,虽然做了重要性采样但仍需要大量的样本,因为最困难的是visibility term.由于Shading point不同方向上的遮挡是不相同的,我们可以对环境光照进行重要性采样,但一个SP周围的visibility项是未知的,因此我们只能盲目的去采样(我个人对盲目采样的理解是,为了确保准确性需要对sp各个方向的遮挡进行采样,因此仍然会生成大量的样本).我们也无法提取出visibility项,因为如果是glossy brdf,他是一个高频的,且Lighting项的积分域是整个半球,因此并不满足smooth或small support,因此无法提取出visibility项.</p>
@@ -322,11 +323,15 @@
 <p>其中，l表示的是阶数，通常第l阶有<img src="https://www.zhihu.com/equation?tex=2l+1" srcset="/img/loading.gif" lazyload alt="[公式]">个基函数，前n阶有<img src="https://www.zhihu.com/equation?tex=n%5E2" srcset="/img/loading.gif" lazyload alt="[公式]">个基函数，m表示的是在某一个频率下基函数的序号，分别从从<img src="https://www.zhihu.com/equation?tex=-l" srcset="/img/loading.gif" lazyload alt="[公式]">一直到<img src="https://www.zhihu.com/equation?tex=l" srcset="/img/loading.gif" lazyload alt="[公式]">。每个基函数都有一个比较复杂的数学表示，对应一个legendre多项式，我们不用去了解legendre多项式,我们只需要知道基函数长这样,可以被某些数学公式来定义不同方向的值是多少就可以了.</p>
 <p>下面定义一些操作：</p>
 <p><strong>投影</strong>：由于一个函数 <img src="https://www.zhihu.com/equation?tex=f(w)" srcset="/img/loading.gif" lazyload alt="[公式]"> 可以由一系列基函数和系数的线性组合表示，那么怎么确定基函数前面的系数，这就需要通过投影操作：</p>
-<p><img src="/Games202-Lecture6/v2-67b41abfd72432eb4f7a422f4be9a013_720w.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<img src="/2022/07/26/Games202-Lecture6/v2-67b41abfd72432eb4f7a422f4be9a013_720w.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:80%;">
+
 <p>我们知道函数F(X),通过对应的基函数B(i)进行投影操作,从而求出各基函数对应的系数Ci,与以下操作是同一个道理,在空间中想描述一个向量，可以xyz三个坐标来表达，把xyz轴当做三个基函数，把向量投影到xyz轴上，得到三个系数就是三个坐标。</p>
 <p><strong>重建</strong>：知道基函数对应的系数，就能用系数和基函数恢复原来的函数。</p>
 <p>由于基函数的阶可以是无限个的，越高的阶可恢复的细节就越好,但一方面是因为更多的系数会带来更大的存储压力、计算压力，而一般描述变化比较平滑的环境漫反射部分，用3阶SH就足够了；另一方面则是因为SH的物理含义不是特别好理解，高阶SH容易出现各种花式Artifact，美术同学一般都会认为这种表现属于bug。</p>
-<p><img src="/Games202-Lecture6/v2-29ee61ce4bbc3bb72154034469da0939_720w.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<img src="/2022/07/26/Games202-Lecture6/v2-29ee61ce4bbc3bb72154034469da0939_720w.png" srcset="/img/loading.gif" lazyload alt="img" style="zoom:80%;">
+
+
+
 <p>f(w)可以是任何一个函数,我们说过基函数可以重建任何一个球面函数,那么我们这里的f(w)就是环境光照,由于环境光是来自于四面八方且都有值,所以环境光照就是一个球面函数,,我们可以把它投影到任何一个SH basis上,可以投影很多阶,但是只需要取前三阶的SH去恢复环境光就可以恢复出最低频的细节了,这个在下文RAVI教授的结论有提到.</p>
 <img src="/2022/07/26/Games202-Lecture6/image-20220726142300864.png" srcset="/img/loading.gif" lazyload alt="image-20220726142300864" style="zoom:80%;">
 
@@ -336,18 +341,22 @@
 <p>BRDF:四维函数，入射出射分别有两个角</p>
 <p>显而易见，我们可以把渲染方程拆解为三项的乘积：lighting、visibility与BRDF。三者都是球面函数，可以用cube来表示。那么最简单的方法就是每个像素挨个去乘，当然这样做的话消耗太大了。假设cube分辨率为6*64*64，那么每个SP我们都要计算6*64*64次。</p>
 <p>因此我们利用基函数的基本原理把一些东西先预计算出来,从而节省开销.</p>
-<p><img src="/Games202-Lecture6/v2-ac89de64010d5e44c6965bde98867b83_720w.jpg" srcset="/img/loading.gif" lazyload alt="img"></p>
+<img src="/2022/07/26/Games202-Lecture6/v2-ac89de64010d5e44c6965bde98867b83_720w.jpg" srcset="/img/loading.gif" lazyload alt="img" style="zoom:80%;">
+
 <p>PRT的基本思想:</p>
 <p>我们把rendering equation分为两部分,lighting 和 light transport.</p>
 <p>假设在渲染时场景中只有lighting项会发生变化(旋转,更换光照等),由于lighting是一个球面函数,因此可以用基函数来表示,在预计算阶段计算出lighting.</p>
 <p>而light transport(visibility和brdf)是不变的,因此相当于对任一shading point来说,light transport项固定的,可以认为是shading point自己的性质,light transport总体来说还是一个球面函数,因此也可以写成基函数形式,是可以预计算出的.</p>
 <p>我们分为两种情况,diffuse和glossy:</p>
 <p>Diffuse:</p>
-<p><img src="/Games202-Lecture6/v2-a73f305b4ce3a40765ba81291217a0c4_720w.jpg" srcset="/img/loading.gif" lazyload alt="img"></p>
+<img src="/2022/07/26/Games202-Lecture6/v2-a73f305b4ce3a40765ba81291217a0c4_720w.jpg" srcset="/img/loading.gif" lazyload alt="img" style="zoom:80%;">
+
 <p>由于在diffuse情况下,brdf几乎是一个常数,因此我们把brdf提到外面.</p>
-<p><img src="/Games202-Lecture6/v2-063db9e7d2ec8701b04a7cec91f4bfbb_720w.jpg" srcset="/img/loading.gif" lazyload alt="img"></p>
+<img src="/2022/07/26/Games202-Lecture6/v2-063db9e7d2ec8701b04a7cec91f4bfbb_720w.jpg" srcset="/img/loading.gif" lazyload alt="img" style="zoom:80%;">
+
 <p>由于lighting项可以写成基函数的形式,因此我们求和式把其代入积分中,对于任何一个积分来说,在Bi的限制下,li此对积分来说是常数,可以提出来.</p>
-<p><img src="/Games202-Lecture6/v2-3140646120f0f4b79b851e94394a4336_720w.jpg" srcset="/img/loading.gif" lazyload alt="img"></p>
+<img src="/2022/07/26/Games202-Lecture6/v2-3140646120f0f4b79b851e94394a4336_720w.jpg" srcset="/img/loading.gif" lazyload alt="img" style="zoom:80%;">
+
 <p>对于积分中的部分来说,Bi是基函数,v和cos项在一起不就是light transport吗,那不就是light transport乘与一个基函数，这就成了lighting transport投影到一个基函数的系数，接下来代入不就能进行预计算了吗，这样就只要算一个点乘就好了。</p>
 <p>之所以说是点乘,结果是个求和,我们要计算 <img src="https://www.zhihu.com/equation?tex=l_%7B1%7DT_%7B1%7D" srcset="/img/loading.gif" lazyload alt="[公式]"> + <img src="https://www.zhihu.com/equation?tex=l_%7B2%7DT_%7B2%7D" srcset="/img/loading.gif" lazyload alt="[公式]"> +……,不正好相当于两个向量点乘吗.</p>
 <p>所以对于任何一个shading point我们去算他的shading 和 shadow,只需要计算一个点乘就可以了,十分方便,</p>
